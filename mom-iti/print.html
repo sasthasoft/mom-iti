@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program Records - E-Commerce View</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(120deg, #ff7043, #e53935);
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  h2 {
+    text-align: center;
+    color: #e53935;
+    margin-bottom: 20px;
+  }
+
+  .filters {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  select, button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+  }
+
+  button {
+    background: linear-gradient(45deg, #e53935, #ff7043);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  button:hover {
+    background: linear-gradient(45deg, #ff5722, #d32f2f);
+  }
+
+  .message {
+    text-align: center;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+  .success { color: green; }
+  .error { color: red; }
+  .loading { color: orange; }
+
+  /* Grid Cards */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .card {
+    background: #fff;
+    border: 2px solid #ff7043;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    overflow: hidden;
+    transition: transform 0.2s;
+    cursor: pointer;
+  }
+
+  .card:hover {
+    transform: scale(1.03);
+  }
+
+  .card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+
+  .card-content {
+    padding: 10px;
+    text-align: center;
+  }
+
+  .card-content h4 {
+    color: #e53935;
+    margin: 5px 0;
+    font-size: 18px;
+  }
+
+  .card-content p {
+    font-size: 14px;
+    color: #555;
+  }
+
+  /* Modal Popup */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-content {
+    background: #fff;
+    max-width: 600px;
+    width: 90%;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    overflow-y: auto;
+    max-height: 90vh;
+  }
+
+  .modal-content h3 {
+    color: #e53935;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .modal-content p {
+    margin: 8px 0;
+    line-height: 1.5;
+  }
+
+  .modal-images {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .modal-images img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+
+  .modal-images img:hover {
+    transform: scale(1.05);
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: #e53935;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+
+  .close-btn:hover {
+    background: #b71c1c;
+  }
+
+  /* Fullscreen Image Viewer */
+  .image-viewer {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .viewer-img {
+    max-width: 90%;
+    max-height: 80%;
+    border-radius: 10px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .viewer-btn {
+    position: absolute;
+    top: 50%;
+    font-size: 30px;
+    color: white;
+    background: rgba(0,0,0,0.5);
+    border: none;
+    padding: 10px 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+
+  .viewer-btn:hover {
+    background: rgba(255,255,255,0.3);
+  }
+
+  .prev-btn { left: 30px; }
+  .next-btn { right: 30px; }
+
+  .close-viewer {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 30px;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  @keyframes fadeIn {
+    from {opacity: 0;} to {opacity: 1;}
+  }
+
+  @media (max-width: 600px) {
+    .modal-content { padding: 15px; }
+    .modal-images img { width: 90px; height: 90px; }
+    .viewer-btn { font-size: 24px; padding: 8px 14px; }
+  }
+
+  /* PRINT A4 MODE */
+  @media print {
+    body * { visibility: hidden !important; }
+    #printArea, #printArea * { visibility: visible !important; }
+
+    #printArea {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 210mm;
+      padding: 20px;
+      background: white;
+    }
+
+    .modal, .image-viewer { display: none !important; }
+  }
+
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>View & Print</h2>
+
+  <div class="filters">
+    <select id="monthFilter">
+      <option value="">All Months</option>
+      <option>January</option><option>February</option><option>March</option>
+      <option>April</option><option>May</option><option>June</option>
+      <option>July</option><option>August</option><option>September</option>
+      <option>October</option><option>November</option><option>December</option>
+    </select>
+
+    <select id="yearFilter">
+      <option value="">All Years</option>
+    </select>
+
+    <button onclick="applyFilter()">Filter</button>
+    <button onclick="resetFilter()">Reset</button>
+  </div>
+
+  <div id="msg" class="message"></div>
+  <div id="gridContainer" class="grid"></div>
+</div>
+
+<!-- Modal Popup -->
+<div id="detailModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal()">X</button>
+
+    <!-- PRINT BUTTON -->
+    <button onclick="printDetails()" 
+      style="background:#0288d1;color:#fff;border:none;padding:6px 15px;border-radius:6px;cursor:pointer;margin-bottom:10px;">
+      Print
+    </button>
+
+    <h3 id="modalProgram"></h3>
+    <p><strong>Date:</strong> <span id="modalDate"></span></p>
+    <p><strong>Month:</strong> <span id="modalMonth"></span></p>
+    <p><strong>Year:</strong> <span id="modalYear"></span></p>
+    <p><strong>Company:</strong> <span id="modalCompany"></span></p>
+    <p><strong>Description:</strong></p>
+    <p id="modalDesc"></p>
+    <div id="modalImages" class="modal-images"></div>
+  </div>
+</div>
+
+<!-- Fullscreen Image Viewer -->
+<div id="imageViewer" class="image-viewer">
+  <button class="close-viewer" onclick="closeViewer()">×</button>
+  <button class="viewer-btn prev-btn" onclick="prevImage()">❮</button>
+  <img id="viewerImage" class="viewer-img" src="" alt="">
+  <button class="viewer-btn next-btn" onclick="nextImage()">❯</button>
+</div>
+
+<!-- PRINT AREA -->
+<div id="printArea" style="display:none;"></div>
+
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbwz4tJ-kmc50xzrtd2HSkHh0s_XVNaQTxjL7fPBSgrRW5HuHVlxSEXGDaMQ9rBLpqEY0w/exec";
+const msg = document.getElementById("msg");
+const gridContainer = document.getElementById("gridContainer");
+let allRecords = [];
+let currentImages = [];
+let currentIndex = 0;
+
+/* --- Helper: month order --- */
+const monthOrder = {
+  January: 1, February: 2, March: 3, April: 4, May: 5, June: 6,
+  July: 7, August: 8, September: 9, October: 10, November: 11, December: 12
+};
+
+/* --- Date Formatting --- */
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = d.toLocaleString('en', { month: 'short' });
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
+/* --- Load Data --- */
+function loadData() {
+  msg.textContent = "Loading records...";
+  msg.className = "message loading";
+
+  fetch(scriptURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "get" })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      allRecords = data.data;
+      sortRecords();
+      populateYearFilter();
+      renderGrid(allRecords);
+      msg.textContent = "Records loaded successfully";
+      msg.className = "message success";
+    } else {
+      msg.textContent = "No records found";
+      msg.className = "message error";
+    }
+  })
+  .catch(err => {
+    msg.textContent = "Error loading data: " + err.message;
+    msg.className = "message error";
+  });
+}
+
+/* --- Sort by Year then Month --- */
+function sortRecords() {
+  allRecords.sort((a, b) => {
+    if (a.year != b.year) return a.year - b.year;
+    return (monthOrder[a.month] || 0) - (monthOrder[b.month] || 0);
+  });
+}
+
+/* --- Populate Year Dropdown --- */
+function populateYearFilter() {
+  const years = [...new Set(allRecords.map(r => r.year))].sort((a,b)=>a-b);
+  const yearSelect = document.getElementById("yearFilter");
+  yearSelect.innerHTML = '<option value="">All Years</option>';
+  years.forEach(y => {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    yearSelect.appendChild(opt);
+  });
+}
+
+/* --- Render Grid --- */
+function renderGrid(records) {
+  gridContainer.innerHTML = "";
+  if (!records.length) {
+    gridContainer.innerHTML = "<p style='text-align:center;'>No records found</p>";
+    return;
+  }
+
+  records.forEach(rec => {
+    const card = document.createElement("div");
+    card.className = "card";
+    const imgSrc = (rec.images && rec.images.length) ? rec.images[0] : "https://via.placeholder.com/300x200?text=No+Image";
+    card.innerHTML = `
+      <img src="${imgSrc}" alt="${rec.programName}">
+      <div class="card-content">
+        <h4>${rec.programName}</h4>
+        <p>${rec.companyName}</p>
+        <p>${rec.month} ${rec.year}</p>
+      </div>
+    `;
+    card.addEventListener("click", () => openModal(rec));
+    gridContainer.appendChild(card);
+  });
+}
+
+/* --- Filters --- */
+function applyFilter() {
+  const month = document.getElementById("monthFilter").value;
+  const year = document.getElementById("yearFilter").value;
+  const filtered = allRecords.filter(r => {
+    return (month === "" || r.month === month) && (year === "" || r.year == year);
+  });
+  renderGrid(filtered);
+}
+
+function resetFilter() {
+  document.getElementById("monthFilter").value = "";
+  document.getElementById("yearFilter").value = "";
+  renderGrid(allRecords);
+}
+
+/* --- Modal --- */
+function openModal(rec) {
+  document.getElementById("detailModal").style.display = "flex";
+  document.getElementById("modalProgram").textContent = rec.programName;
+  document.getElementById("modalDate").textContent = formatDate(rec.date);
+  document.getElementById("modalMonth").textContent = rec.month;
+  document.getElementById("modalYear").textContent = rec.year;
+  document.getElementById("modalCompany").textContent = rec.companyName;
+  document.getElementById("modalDesc").textContent = rec.description;
+  
+  const modalImgs = document.getElementById("modalImages");
+  modalImgs.innerHTML = "";
+  currentImages = rec.images || [];
+  currentImages.forEach((img, index) => {
+    const im = document.createElement("img");
+    im.src = img;
+    im.addEventListener("click", () => openViewer(index));
+    modalImgs.appendChild(im);
+  });
+}
+
+function closeModal() {
+  document.getElementById("detailModal").style.display = "none";
+}
+
+/* --- Fullscreen Image Viewer --- */
+function openViewer(index) {
+  if (!currentImages.length) return;
+  currentIndex = index;
+  document.getElementById("imageViewer").style.display = "flex";
+  document.getElementById("viewerImage").src = currentImages[currentIndex];
+}
+
+function closeViewer() {
+  document.getElementById("imageViewer").style.display = "none";
+}
+
+function nextImage() {
+  currentIndex = (currentIndex + 1) % currentImages.length;
+  document.getElementById("viewerImage").src = currentImages[currentIndex];
+}
+
+function prevImage() {
+  currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+  document.getElementById("viewerImage").src = currentImages[currentIndex];
+}
+
+/* --- CLOSE on outside click --- */
+window.onclick = function(e) {
+  const modal = document.getElementById("detailModal");
+  const viewer = document.getElementById("imageViewer");
+  if (e.target === modal) modal.style.display = "none";
+  if (e.target === viewer) viewer.style.display = "none";
+};
+
+/* --- PRINT FUNCTION --- */
+function printDetails() {
+  const printDiv = document.getElementById("printArea");
+
+  let html = `
+    <h2 style="text-align:center; color:#d32f2f;">${document.getElementById("modalProgram").textContent}</h2>
+    <p><strong>Date:</strong> ${document.getElementById("modalDate").textContent}</p>
+    <p><strong>Month:</strong> ${document.getElementById("modalMonth").textContent}</p>
+    <p><strong>Year:</strong> ${document.getElementById("modalYear").textContent}</p>
+    <p><strong>Company:</strong> ${document.getElementById("modalCompany").textContent}</p>
+    <h3>Description:</h3>
+    <p>${document.getElementById("modalDesc").textContent}</p>
+    <h3>Images:</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;">`;
+
+  currentImages.forEach(img => {
+    html += `<img src="${img}" style="width:150px;height:150px;object-fit:cover;border:1px solid #ccc;">`;
+  });
+
+  html += `</div>`;
+
+  printDiv.innerHTML = html;
+  printDiv.style.display = "block";
+  window.print();
+  printDiv.style.display = "none";
+}
+
+window.onload = loadData;
+</script>
+</body>
+</html>

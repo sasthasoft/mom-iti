@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sakotharan Blood Animation</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+    }
+
+    /* Zooming Image */
+    .zoom-image {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      animation: zoomOut 3s ease-out forwards;
+      z-index: 10;
+    }
+
+    .zoom-image img {
+      max-width: 90vw;
+      max-height: 90vh;
+      width: auto;
+      height: auto;
+      display: block;
+    }
+
+    @keyframes zoomOut {
+      0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Blood drop and streak styles */
+    .blood-drop, .blood-streak {
+      position: absolute;
+      border-radius: 50%;
+      background: crimson;
+      box-shadow: 0 0 10px orange;
+    }
+
+    .blood-drop {
+      width: 10px;
+      height: 10px;
+      animation: drip 4s linear infinite;
+    }
+
+    @keyframes drip {
+      0% { top: -20px; opacity: 1; }
+      100% { top: 100vh; opacity: 0; }
+    }
+
+    .blood-streak {
+      width: 4px;
+      height: 60px;
+      animation: streak 5s linear infinite;
+      opacity: 0.6;
+    }
+
+    @keyframes streak {
+      0% { top: -60px; opacity: 0.8; }
+      100% { top: 100vh; opacity: 0; }
+    }
+
+    /* Different positions and delays */
+    .blood-drop:nth-child(2) { left: 15%; animation-delay: 0s; }
+    .blood-drop:nth-child(3) { left: 35%; animation-delay: 1s; }
+    .blood-drop:nth-child(4) { left: 55%; animation-delay: 2s; }
+    .blood-drop:nth-child(5) { left: 75%; animation-delay: 3s; }
+
+    .blood-streak:nth-child(6) { left: 25%; animation-delay: 0.5s; }
+    .blood-streak:nth-child(7) { left: 50%; animation-delay: 1.5s; }
+    .blood-streak:nth-child(8) { left: 70%; animation-delay: 2.5s; }
+  </style>
+</head>
+<body>
+
+  <!-- Center zooming image -->
+  <div class="zoom-image">
+    <img src="iti.png" alt="Sakotharan Logo">
+  </div>
+
+  <!-- Blood animation elements -->
+  <div class="blood-drop"></div>
+  <div class="blood-drop"></div>
+  <div class="blood-drop"></div>
+  <div class="blood-drop"></div>
+
+  <div class="blood-streak"></div>
+  <div class="blood-streak"></div>
+  <div class="blood-streak"></div>
+
+  <!-- Redirect to index.html after 5 seconds -->
+  <script>
+    setTimeout(function() {
+      window.location.href = "main.html";
+    }, 6000);
+  </script>
+</body>
+</html>
